@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanggahan Bulky - GTL Batuceper Hub</title>
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        body { background-color: #0b132b; color: #ffffff; }
+        .card { background-color: #1c2541; border-radius: 12px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 font-sans">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <p class="text-xs tracking-wider text-gray-400">GTL BATUCEPER HUB</p>
+            <h1 class="text-3xl font-bold mt-1 text-white">Sanggahan Bulky</h1>
+            <p class="text-sm text-gray-300 mt-1">Formulir sanggahan paket bulky — GTL Batuceper Hub</p>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="bg-amber-100 border-l-4 border-amber-500 text-amber-900 p-4 rounded mb-6 shadow">
+            <p class="font-bold text-sm mb-2">⚠️ WAJIB DIPERHATIKAN !!!</p>
+            <ol class="list-decimal list-inside text-xs space-y-1 font-medium">
+                <li>Upload sanggahan maksimal H+1 dari tanggal paket terkirim/delivered</li>
+                <li>No Resi tidak boleh ada yang salah dan kurang/lebih</li>
+                <li>Status paket wajib DELIVERED</li>
+            </ol>
+        </div>
+
+        <!-- Form -->
+        <form id="sanggahanForm" class="space-y-6">
+            <div class="card p-6 shadow-xl space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-300">Nama (Huruf Besar) *</label>
+                    <input type="text" id="nama" required class="w-full p-3 rounded bg-[#0b132b] border border-gray-700 text-white placeholder-gray-500 uppercase focus:outline-none focus:border-amber-500 text-sm" placeholder="NAMA LENGKAP">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-300">ID Rider *</label>
+                    <input type="text" id="idRider" required class="w-full p-3 rounded bg-[#0b132b] border border-gray-700 text-white placeholder-gray-500 uppercase focus:outline-none focus:border-amber-500 text-sm" placeholder="ID RIDER">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-300">Tanggal *</label>
+                    <input type="date" id="tanggal" required class="w-full p-3 rounded bg-[#0b132b] border border-gray-700 text-white focus:outline-none focus:border-amber-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-300">Nomor AWB (Huruf Besar) *</label>
+                    <input type="text" id="nomorAwb" required class="w-full p-3 rounded bg-[#0b132b] border border-gray-700 text-white placeholder-gray-500 uppercase focus:outline-none focus:border-amber-500 text-sm" placeholder="Contoh: GTL72123456789">
+                </div>
+            </div>
+
+            <!-- Kamera 1 -->
+            <div class="card p-6 shadow-xl text-center">
+                <label class="block text-left text-xs font-bold uppercase tracking-wider mb-1 text-gray-300">📸 Upload Foto Terlihat Nomer Resi *</label>
+                <p class="text-left text-[11px] text-amber-400 mb-4">Wajib via kamera langsung — galeri tidak diizinkan.</p>
+                <input type="file" id="camResi" accept="image/*" capture="environment" class="hidden" required>
+                <button type="button" onclick="document.getElementById('camResi').click()" class="w-full border-2 border-dashed border-gray-600 hover:border-amber-500 rounded-lg p-6 flex flex-col items-center justify-center transition bg-[#0b132b]">
+                    <span class="text-2xl mb-1">📷</span>
+                    <span class="text-sm font-semibold text-amber-400">Buka Kamera</span>
+                    <span class="text-[10px] text-gray-400 mt-1">Foto + timestamp & lokasi otomatis</span>
+                </button>
+                <div id="previewResi" class="mt-3 hidden text-xs text-green-400 font-medium">✓ Foto Resi Berhasil Diambil</div>
+            </div>
+
+            <!-- Kamera 2 -->
+            <div class="card p-6 shadow-xl text-center">
+                <label class="block text-left text-xs font-bold uppercase tracking-wider mb-1 text-gray-300">📸 Upload Foto Terlihat Dalam Pokoyake *</label>
+                <p class="text-left text-[11px] text-amber-400 mb-4">Wajib via kamera langsung — galeri tidak diizinkan.</p>
+                <input type="file" id="camPokoyake" accept="image/*" capture="environment" class="hidden" required>
+                <button type="button" onclick="document.getElementById('camPokoyake').click()" class="w-full border-2 border-dashed border-gray-600 hover:border-amber-500 rounded-lg p-6 flex flex-col items-center justify-center transition bg-[#0b132b]">
+                    <span class="text-2xl mb-1">📷</span>
+                    <span class="text-sm font-semibold text-amber-400">Buka Kamera</span>
+                    <span class="text-[10px] text-gray-400 mt-1">Foto + timestamp & lokasi otomatis</span>
+                </button>
+                <div id="previewPokoyake" class="mt-3 hidden text-xs text-green-400 font-medium">✓ Foto Pokoyake Berhasil Diambil</div>
+            </div>
+
+            <p class="text-[10px] text-gray-400 text-center leading-relaxed">
+                ℹ️ Setiap foto otomatis diberi waktu, koordinat, dan label foto. Galeri tidak tersedia — foto wajib dari kamera realtime.
+            </p>
+
+            <button type="submit" id="btnSubmit" class="w-full bg-[#f25c05] hover:bg-[#d44f00] text-white font-bold p-4 rounded-xl transition shadow-lg text-sm tracking-wide uppercase">
+                Kirim Sanggahan
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI BAWAH INI (Ganti teks di dalam tanda kutip)
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxvbwNFCsufFpzFOtzQDIl5VThUN0OvlwSo8fGToiEror8sZSkPy9sSnj9dro1QglLS/exec";
+
+        let geoLoc = "Koordinat tidak diizinkan";
+        navigator.geolocation.getCurrentPosition(p => { geoLoc = `${p.coords.latitude}, ${p.coords.longitude}`; });
+
+        let resiBase64 = "", pokoyakeBase64 = "";
+
+        function processFile(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) { callback(e.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('camResi').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                processFile(e.target.files[0], base64 => { resiBase64 = base64; document.getElementById('previewResi').classList.remove('hidden'); });
+            }
+        });
+
+        document.getElementById('camPokoyake').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                processFile(e.target.files[0], base64 => { pokoyakeBase64 = base64; document.getElementById('previewPokoyake').classList.remove('hidden'); });
+            }
+        });
+
+        document.getElementById('sanggahanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerText = "MENGIRIM DATA...";
+
+            const payload = {
+                action: "submitForm",
+                nama: document.getElementById('nama').value.toUpperCase(),
+                idRider: document.getElementById('idRider').value.toUpperCase(),
+                tanggal: document.getElementById('tanggal').value,
+                nomorAwb: document.getElementById('nomorAwb').value.toUpperCase(),
+                fotoResiBase64: resiBase64,
+                fotoPokoyakeBase64: pokoyakeBase64,
+                koordinat: geoLoc
+            };
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                alert("Sanggahan Berhasil Dikirim!");
+                document.getElementById('sanggahanForm').reset();
+                document.getElementById('previewResi').classList.add('hidden');
+                document.getElementById('previewPokoyake').classList.add('hidden');
+            } catch (err) {
+                alert("Terjadi kesalahan pengiriman.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Kirim Sanggahan";
+            }
+        });
+    </script>
+</body>
+</html>

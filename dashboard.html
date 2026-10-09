@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring Admin</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">📊 Dashboard Monitoring</h1>
+                <p class="text-sm text-gray-500">Pantauan Data Sanggahan Bulky - GTL Batuceper Hub</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="password" id="secretToken" placeholder="Masukkan Token Admin" class="p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="loadData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded font-medium transition shadow">Muat Data</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                <span class="text-sm font-semibold text-gray-700">Daftar Laporan Masuk</span>
+                <input type="text" id="searchBar" onkeyup="filterTable()" placeholder="Cari Nama / No AWB..." class="p-2 border border-gray-300 rounded text-xs w-48 md:w-64">
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="dataTable">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 uppercase text-[11px] font-bold tracking-wider border-b border-gray-200">
+                            <th class="p-4">Waktu Input</th>
+                            <th class="p-4">Nama Rider</th>
+                            <th class="p-4">ID Rider</th>
+                            <th class="p-4">Tanggal Paket</th>
+                            <th class="p-4">No AWB / Resi</th>
+                            <th class="p-4">Foto Resi (Publik)</th>
+                            <th class="p-4">Foto Pokoyake (Publik)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-gray-600 divide-y divide-gray-100" id="tableBody">
+                        <tr>
+                            <td colspan="7" class="p-8 text-center text-gray-400 italic">Silakan masukkan token admin lalu klik 'Muat Data' untuk menampilkan laporan.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI BAWAH INI (Ganti teks di dalam tanda kutip)
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxvbwNFCsufFpzFOtzQDIl5VThUN0OvlwSo8fGToiEror8sZSkPy9sSnj9dro1QglLS/exec";
+
+        async function loadData() {
+            const token = document.getElementById('secretToken').value;
+            const tbody = document.getElementById('tableBody');
+            
+            if(!token) { alert("Harap isi token rahasia!"); return; }
+            tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-blue-600 font-medium animate-pulse">Sedang mengambil data dari Google Sheets...</td></tr>`;
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' }, // Menggunakan text/plain untuk bypass CORS preflight di GAS
+                    body: JSON.stringify({ action: "fetchDashboard", secretToken: token })
+                });
+                
+                const res = await response.json();
+                
+                if(res.status === "error") {
+                    alert("Akses Ditolak! Token salah.");
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-medium">Gagal memuat data: Unauthorized</td></tr>`;
+                    return;
+                }
+
+                if(res.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">Belum ada data sanggahan yang masuk.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = "";
+                res.data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition";
+                    tr.innerHTML = `
+                        <td class="p-4 text-xs">${new Date(row["Timestamp"]).toLocaleString('id-ID')}</td>
+                        <td class="p-4 font-semibold text-gray-800">${row["Nama"] || '-'}</td>
+                        <td class="p-4">${row["ID Rider"] || '-'}</td>
+                        <td class="p-4 text-xs">${row["Tanggal"] || '-'}</td>
+                        <td class="p-4 font-mono font-medium text-blue-600">${row["Nomor AWB"] || '-'}</td>
+                        <td class="p-4">
+                            ${row["Foto Resi URL"] ? `<a href="\${row["Foto Resi URL"]}" target="_blank" class="text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded font-medium border border-green-300">Buka Foto ↗</a>` : '<span class="text-gray-400">-</span>'}
+                        </td>
+                        <td class="p-4">
+                            ${row["Foto Pokoyake URL"] ? `<a href="\${row["Foto Pokoyake URL"]}" target="_blank" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded font-medium border border-amber-300">Buka Foto ↗</a>` : '<span class="text-gray-400">-</span>'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (err) {
+                alert("Gagal terhubung ke server.");
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+            }
+        }
+
+        function filterTable() {
+            const input = document.getElementById("searchBar").value.toUpperCase();
+            const rows = document.getElementById("tableBody").getElementsByTagName("tr");
+            
+            for (let i = 0; i < rows.length; i++) {
+                const tdNama = rows[i].getElementsByTagName("td")[1];
+                const tdAwb = rows[i].getElementsByTagName("td")[4];
+                if (tdNama || tdAwb) {
+                    const txtNama = tdNama.textContent || tdNama.innerText;
+                    const txtAwb = tdAwb.textContent || tdAwb.innerText;
+                    if (txtNama.toUpperCase().indexOf(input) > -1 || txtAwb.toUpperCase().indexOf(input) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }       
+            }
+        }
+    </script>
+</body>
+</html>
